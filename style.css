@@ -257,3 +257,8 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
 }
 .history-table-wrapper table { min-width: 100%; }
 .history-table-wrapper th { background: #f8fafc; position: sticky; top: 0; z-index: 10;}
+/* --- FIX: Center Align the Status Column --- */
+/* This targets the 3rd column (Status) specifically */
+th:nth-child(3), td:nth-child(3) {
+    text-align: center;
+}
