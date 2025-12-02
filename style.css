@@ -1,0 +1,259 @@
+/* Color Variables */
+:root {
+    --primary: #2563eb;
+    --dark: #1e293b;
+    --light: #f1f5f9;
+    --danger: #ef4444;
+    --success: #22c55e;
+}
+
+/* Basic Reset */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+body { background-color: var(--light); color: var(--dark); }
+
+/* --- FIXED: REMOVE BROWSER DEFAULT ARROWS FROM NUMBER INPUTS --- */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield; /* This line fixes the compatibility warning */
+}
+
+/* Navbar Styles */
+.navbar {
+    background: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.logo { font-size: 1.2rem; font-weight: bold; color: var(--dark); }
+.nav-tools { display: flex; gap: 10px; align-items: center; }
+
+#searchInput {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    width: 250px;
+}
+
+/* Button Styles */
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-outline:hover { background: #f1f5f9; border-color: #94a3b8; }
+
+.btn-icon {
+    background: #e2e8f0;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+.btn-icon:hover { transform: scale(1.05); background: #cbd5e1; }
+
+.btn-save { 
+    width: 100%; 
+    background: var(--primary); 
+    color: white; 
+    padding: 12px; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+.btn-log {
+    background: var(--dark);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+}
+.btn-log:hover { background: #334155; }
+
+/* Table Styles */
+.container { padding: 2rem; }
+
+.table-wrapper {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    overflow-x: auto;
+}
+
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;}
+
+/* Image Styling */
+.product-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+/* Stock Control (+/- and Input) */
+.stock-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    background: #fff;
+    padding: 5px;
+    border-radius: 8px;
+    width: fit-content;
+}
+
+/* Direct Input Box for Stock */
+.stock-input {
+    width: 70px;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+.stock-input:focus {
+    border-color: var(--primary);
+    outline: none;
+    background-color: #f0f9ff;
+}
+
+/* Delivery Column Styling */
+.delivery-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.total-delivered { 
+    font-weight: 800; 
+    font-size: 1.1rem; 
+    color: var(--primary);
+}
+.last-updated { 
+    font-size: 0.75rem; 
+    color: #64748b; 
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+/* Status Badges */
+.badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;}
+.badge-ok { background: #dcfce7; color: #166534; }
+.badge-low { background: #fee2e2; color: #991b1b; }
+
+/* Modal Styles */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 100; 
+    left: 0; top: 0; width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.5); 
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.large-modal { max-width: 700px; }
+
+.close { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
+.close:hover { color: #000; }
+
+.form-row { display: flex; gap: 15px; }
+.form-row > div { flex: 1; }
+
+input { 
+    width: 100%; 
+    padding: 10px; 
+    margin: 8px 0 15px 0; 
+    border: 1px solid #cbd5e1; 
+    border-radius: 6px;
+}
+label { font-size: 0.9rem; font-weight: 600; color: #475569; }
+
+/* Delivery Log Specific Styles */
+.add-delivery-box {
+    background: #f0f9ff; 
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #bae6fd;
+    margin-bottom: 25px;
+}
+.delivery-form-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+.input-group { flex: 1; }
+.input-group input { margin-bottom: 0; background: white; }
+
+.history-table-wrapper {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+.history-table-wrapper table { min-width: 100%; }
+.history-table-wrapper th { background: #f8fafc; position: sticky; top: 0; z-index: 10;}
