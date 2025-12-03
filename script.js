@@ -17,6 +17,7 @@ const db = firebase.database();
 const dbRef = db.ref('inventory');
 
 let inventory = [];
+let currentFilter = 'all'; // 'all' or 'starred'
 
 // --- 3. THE LISTENER ---
 dbRef.on('value', (snapshot) => {
@@ -27,11 +28,13 @@ dbRef.on('value', (snapshot) => {
         inventory = data;
     }
     
+    // Migration check: Ensure deliveryLog and isStarred exist
     inventory.forEach(item => {
         if (!item.deliveryLog) item.deliveryLog = [];
+        if (item.isStarred === undefined) item.isStarred = false; // Add default false
     });
     
-    renderTable(inventory);
+    refreshView(); // Re-render based on current tab
 });
 
 // --- SELECT ELEMENTS ---
@@ -46,6 +49,9 @@ const deliveryIndexInput = document.getElementById('deliveryIndex');
 const deliveryItemName = document.getElementById('deliveryItemName');
 const historyList = document.getElementById('historyList');
 
+const tabAll = document.getElementById('tabAll');
+const tabStarred = document.getElementById('tabStarred');
+
 // --- HELPER: SAVE TO CLOUD ---
 function saveData() {
     dbRef.set(inventory).catch((error) => {
@@ -53,16 +59,53 @@ function saveData() {
     });
 }
 
+// --- NEW: TAB SWITCHING ---
+window.switchTab = (mode) => {
+    currentFilter = mode;
+    
+    // Update button visual state
+    if (mode === 'all') {
+        tabAll.classList.add('active');
+        tabStarred.classList.remove('active');
+    } else {
+        tabAll.classList.remove('active');
+        tabStarred.classList.add('active');
+    }
+
+    refreshView();
+};
+
+// --- VIEW CONTROLLER ---
+function refreshView() {
+    const term = searchInput.value.toLowerCase();
+    
+    // Filter by Search Text
+    let filtered = inventory.filter(item => 
+        item.name.toLowerCase().includes(term) || item.sku.toLowerCase().includes(term)
+    );
+
+    // If Starred Tab is active, filter again
+    if (currentFilter === 'starred') {
+        filtered = filtered.filter(item => item.isStarred === true);
+    }
+
+    renderTable(filtered);
+}
+
 // --- RENDER TABLE ---
 function renderTable(data) {
     tableBody.innerHTML = '';
     
     if (data.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">No items found. Click "+ Add New Item".</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No items found.</td></tr>';
         return;
     }
 
-    data.forEach((item, index) => {
+    data.forEach((item) => {
+        // IMPORTANT: We must find the REAL index of this item in the main inventory
+        // otherwise editing/deleting while in "Starred" view will break everything.
+        const realIndex = inventory.indexOf(item); 
+
         const totalDelivered = item.deliveryLog ? item.deliveryLog.reduce((sum, log) => sum + log.qty, 0) : 0;
         
         let lastInfo = "No history";
@@ -76,8 +119,17 @@ function renderTable(data) {
         const statusClass = isLow ? 'badge-low' : 'badge-ok';
         const statusText = isLow ? 'Low Stock' : 'In Stock';
 
+        // Star Icon Logic
+        const starClass = item.isStarred ? 'fa-solid starred' : 'fa-regular';
+
         const row = `
             <tr>
+                <td style="text-align:center;">
+                    <button class="btn-star ${item.isStarred ? 'starred' : ''}" onclick="toggleStar(${realIndex})">
+                        <i class="${starClass} fa-star"></i>
+                    </button>
+                </td>
+
                 <td><img src="${item.image}" class="product-img" alt="img" onerror="this.src='https://via.placeholder.com/60?text=No+Img'"></td>
                 <td>
                     <div style="font-weight:bold; font-size:1.05rem;">${item.name}</div>
@@ -86,27 +138,34 @@ function renderTable(data) {
                 <td><span class="badge ${statusClass}">${statusText}</span></td>
                 <td>
                     <div class="stock-control">
-                        <button class="btn-icon" onclick="updateAvailable(${index}, -1)" style="width:24px; height:24px;">-</button>
-                        <input type="number" class="stock-input" value="${item.available}" onchange="manualStockUpdate(${index}, this.value)">
-                        <button class="btn-icon" onclick="updateAvailable(${index}, 1)" style="width:24px; height:24px;">+</button>
+                        <button class="btn-icon" onclick="updateAvailable(${realIndex}, -1)" style="width:24px; height:24px;">-</button>
+                        <input type="number" class="stock-input" value="${item.available}" onchange="manualStockUpdate(${realIndex}, this.value)">
+                        <button class="btn-icon" onclick="updateAvailable(${realIndex}, 1)" style="width:24px; height:24px;">+</button>
                     </div>
                 </td>
                 <td>
                     <div class="delivery-cell">
                         <div class="total-delivered">${totalDelivered} Units</div>
                         <div class="last-updated"><i class="fa-regular fa-clock"></i> Last: ${lastInfo}</div>
-                        <button class="btn-log" onclick="openDeliveryModal(${index})">View Log / Add Delivery</button>
+                        <button class="btn-log" onclick="openDeliveryModal(${realIndex})">View Log / Add Delivery</button>
                     </div>
                 </td>
                 <td>
-                    <button onclick="openEditModal(${index})" class="btn-icon" style="color: #2563eb; margin-right: 5px;"><i class="fa-solid fa-pen"></i></button>
-                    <button onclick="deleteItem(${index})" class="btn-icon" style="color: #ef4444;"><i class="fa-solid fa-trash"></i></button>
+                    <button onclick="openEditModal(${realIndex})" class="btn-icon" style="color: #2563eb; margin-right: 5px;"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteItem(${realIndex})" class="btn-icon" style="color: #ef4444;"><i class="fa-solid fa-trash"></i></button>
                 </td>
             </tr>
         `;
         tableBody.innerHTML += row;
     });
 }
+
+// --- NEW: STAR TOGGLE ---
+window.toggleStar = (index) => {
+    // Flip the value (true -> false, false -> true)
+    inventory[index].isStarred = !inventory[index].isStarred;
+    saveData();
+};
 
 // --- LOGIC FUNCTIONS ---
 window.manualStockUpdate = (index, value) => {
@@ -209,10 +268,12 @@ addForm.addEventListener('submit', (e) => {
     };
 
     if (editIndex > -1) {
+        // IMPORTANT: We must preserve the existing Star Status when editing
+        newItem.isStarred = inventory[editIndex].isStarred; 
         newItem.deliveryLog = inventory[editIndex].deliveryLog || []; 
         inventory[editIndex] = newItem;
     } else {
-        // --- PRESERVED: Newest on Top ---
+        newItem.isStarred = false; // New items start un-starred
         inventory.unshift(newItem);
     }
     saveData();
@@ -248,11 +309,7 @@ window.onclick = (e) => {
 };
 
 searchInput.addEventListener('keyup', (e) => {
-    const term = e.target.value.toLowerCase();
-    const filtered = inventory.filter(item => 
-        item.name.toLowerCase().includes(term) || item.sku.toLowerCase().includes(term)
-    );
-    renderTable(filtered);
+    refreshView(); // Use refreshView instead of calling renderTable directly
 });
 
 document.getElementById('addNewBtn').onclick = () => {
@@ -280,26 +337,19 @@ window.checkPin = () => {
     }
 }
 
-// --- 5. FIXED: AMAZON IMAGE FETCHER ---
+// --- AMAZON IMAGE FETCHER ---
 window.autoFillImage = () => {
     const asinInput = document.getElementById('prodSku');
     const imgInput = document.getElementById('prodImg');
     const preview = document.getElementById('imgPreview');
-    
-    // Clean up the ASIN input
     const asin = asinInput.value.trim();
     
     if (asin.length === 10) {
-        // This is the classic, more robust Amazon image structure
         const amazonImageLink = `https://images-na.ssl-images-amazon.com/images/P/${asin}.01._SCLZZZZZZZ_.jpg`;
-        
         imgInput.value = amazonImageLink;
         preview.src = amazonImageLink;
         preview.style.display = "block";
     } else {
-        // We don't clear the input if it's less than 10, 
-        // in case you are pasting a manual link.
-        // We only hide the preview.
         preview.style.display = "none";
     }
 }

@@ -30,12 +30,23 @@
         </div>
     </nav>
 
+    <div class="container" style="padding-bottom: 0;">
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab('all')" id="tabAll">
+                <i class="fa-solid fa-list"></i> All Inventory
+            </button>
+            <button class="tab-btn" onclick="switchTab('starred')" id="tabStarred">
+                <i class="fa-solid fa-star"></i> Important (Starred)
+            </button>
+        </div>
+    </div>
+
     <div class="container">
         <div class="table-wrapper">
             <table id="inventoryTable">
                 <thead>
                     <tr>
-                        <th style="width: 80px;">Image</th>
+                        <th style="width: 50px;">Fav</th> <th style="width: 80px;">Image</th>
                         <th>Product Details</th>
                         <th>Status</th>
                         <th>Available Stock (Manual)</th>
@@ -44,7 +55,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td colspan="6" style="text-align:center; padding:20px;">Connecting to database...</td></tr>
+                    <tr><td colspan="7" style="text-align:center; padding:20px;">Connecting to database...</td></tr>
                 </tbody>
             </table>
         </div>

@@ -5,6 +5,7 @@
     --light: #f1f5f9;
     --danger: #ef4444;
     --success: #22c55e;
+    --gold: #f59e0b;
 }
 
 /* Basic Reset */
@@ -35,6 +36,32 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
     border: 1px solid #ddd;
     border-radius: 6px;
     width: 250px;
+}
+
+/* NEW: TAB STYLES */
+.tabs-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: -10px; /* Pull closer to table */
+}
+
+.tab-btn {
+    background: #e2e8f0;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-weight: 600;
+    color: #64748b;
+    transition: 0.2s;
+}
+
+.tab-btn:hover { background: #cbd5e1; }
+
+.tab-btn.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
 }
 
 /* Button Styles */
@@ -109,7 +136,7 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 
 .table-wrapper {
     background: white;
-    border-radius: 10px;
+    border-radius: 0 10px 10px 10px; /* Top-left sharp for tabs */
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     overflow-x: auto;
 }
@@ -125,8 +152,24 @@ th, td {
 
 th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;}
 
-/* Center Align the Status Column */
-th:nth-child(3), td:nth-child(3) { text-align: center; }
+/* Center Align Status (now 4th column) */
+th:nth-child(4), td:nth-child(4) { text-align: center; }
+
+/* Star Button Style */
+.btn-star {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #cbd5e1; /* Gray by default */
+    transition: 0.2s;
+}
+.btn-star.starred {
+    color: var(--gold); /* Gold when active */
+    filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.5));
+}
+.btn-star:hover { transform: scale(1.2); }
+
 
 /* Image Styling */
 .product-img {
@@ -254,15 +297,15 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
 .history-table-wrapper table { min-width: 100%; }
 .history-table-wrapper th { background: #f8fafc; position: sticky; top: 0; z-index: 10;}
 
-/* --- FIXED: LOGIN SCREEN STYLES --- */
+/* --- LOGIN SCREEN STYLES --- */
 .login-overlay {
-    position: fixed !important; /* Forces it to stay put */
+    position: fixed !important; 
     top: 0; 
     left: 0;
-    width: 100vw;  /* Covers full viewport width */
-    height: 100vh; /* Covers full viewport height */
-    background: #1e293b; /* Dark Blue/Black */
-    z-index: 10000; /* Extremely high number to sit on top of everything */
+    width: 100vw;  
+    height: 100vh; 
+    background: #1e293b; 
+    z-index: 10000; 
     display: flex;
     justify-content: center;
     align-items: center;
