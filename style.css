@@ -135,10 +135,12 @@ th, td {
 th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;}
 
 /* Image Styling */
+/* FIXED: Image fits inside the box without zooming/cropping */
 .product-img {
     width: 60px;
     height: 60px;
-    object-fit: cover;
+    object-fit: contain; /* Shows the whole image */
+    background-color: white; /* White background behind irregular shapes */
     border-radius: 6px;
     border: 1px solid #eee;
 }
@@ -156,6 +158,7 @@ th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 0.9
 }
 
 /* Direct Input Box for Stock */
+/* FIXED: Removes extra spacing so it aligns with buttons */
 .stock-input {
     width: 70px;
     padding: 5px;
@@ -164,6 +167,7 @@ th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 0.9
     border-radius: 4px;
     font-size: 1rem;
     font-weight: bold;
+    margin: 0; /* This forces the box to line up perfectly */
 }
 .stock-input:focus {
     border-color: var(--primary);
