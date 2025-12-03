@@ -13,33 +13,26 @@ const firebaseConfig = {
 // ******************************************************
 
 // --- 2. INITIALIZE FIREBASE ---
-// Initialize Firebase using the global variable from our HTML tags
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-
-// We are creating a reference to 'inventory' in the database
 const dbRef = db.ref('inventory');
 
 let inventory = [];
 
-// --- 3. THE LISTENER (Real-time Connection) ---
-// This runs automatically whenever the cloud database changes.
+// --- 3. THE LISTENER ---
 dbRef.on('value', (snapshot) => {
     const data = snapshot.val();
-    
-    // If database is empty (null), make it an empty list
     if (data === null) {
         inventory = [];
     } else {
         inventory = data;
     }
     
-    // Migration check (ensure structure is correct)
+    // Migration check
     inventory.forEach(item => {
         if (!item.deliveryLog) item.deliveryLog = [];
     });
     
-    // Update the screen
     renderTable(inventory);
 });
 
@@ -57,14 +50,9 @@ const historyList = document.getElementById('historyList');
 
 // --- HELPER: SAVE TO CLOUD ---
 function saveData() {
-    // We send the whole inventory array to the cloud
-    dbRef.set(inventory)
-        .then(() => {
-            console.log("Data saved to cloud successfully");
-        })
-        .catch((error) => {
-            alert("Error saving data: " + error.message);
-        });
+    dbRef.set(inventory).catch((error) => {
+        alert("Error saving data: " + error.message);
+    });
 }
 
 // --- RENDER TABLE ---
@@ -127,13 +115,13 @@ window.manualStockUpdate = (index, value) => {
     let newVal = parseInt(value);
     if (isNaN(newVal) || newVal < 0) newVal = 0;
     inventory[index].available = newVal;
-    saveData(); // Save to Cloud
+    saveData();
 };
 
 window.updateAvailable = (index, change) => {
     inventory[index].available += change;
     if(inventory[index].available < 0) inventory[index].available = 0;
-    saveData(); // Save to Cloud
+    saveData();
 };
 
 window.openDeliveryModal = (index) => {
@@ -157,7 +145,7 @@ deliveryForm.addEventListener('submit', (e) => {
     if(!inventory[index].deliveryLog) inventory[index].deliveryLog = [];
     inventory[index].deliveryLog.push({ date: dateVal, qty: qtyVal });
 
-    saveData(); // Save to Cloud
+    saveData();
     renderHistoryTable(inventory[index].deliveryLog); 
     document.getElementById('logQty').value = "";
 });
@@ -206,7 +194,7 @@ window.deleteLog = (logIndex) => {
     const itemIndex = parseInt(deliveryIndexInput.value);
     if(confirm('Delete this history entry?')) {
         inventory[itemIndex].deliveryLog.splice(logIndex, 1);
-        saveData(); // Save to Cloud
+        saveData();
         renderHistoryTable(inventory[itemIndex].deliveryLog);
     }
 };
@@ -228,7 +216,7 @@ addForm.addEventListener('submit', (e) => {
     } else {
         inventory.push(newItem);
     }
-    saveData(); // Save to Cloud
+    saveData();
     closeAllModals();
 });
 
@@ -247,7 +235,7 @@ window.openEditModal = (index) => {
 window.deleteItem = (index) => {
     if(confirm('Delete this product and all its history?')) {
         inventory.splice(index, 1);
-        saveData(); // Save to Cloud
+        saveData();
     }
 };
 
@@ -275,3 +263,21 @@ document.getElementById('addNewBtn').onclick = () => {
     document.getElementById('saveBtn').innerText = "Save Product";
     itemModal.style.display = "block";
 };
+
+// --- 4. NEW: LOGIN SYSTEM (CHANGE PIN HERE) ---
+const SECRET_PIN = "3647"; // <--- CHANGE THIS TO YOUR DESIRED PASSWORD
+
+window.checkPin = () => {
+    const input = document.getElementById('pinInput').value;
+    const errorMsg = document.getElementById('loginError');
+    const overlay = document.getElementById('loginOverlay');
+    
+    if (input === SECRET_PIN) {
+        // Correct Password
+        overlay.style.display = "none"; // Hide the lock screen
+    } else {
+        // Wrong Password
+        errorMsg.style.display = "block";
+        document.getElementById('pinInput').value = ""; // Clear input
+    }
+}

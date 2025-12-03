@@ -12,6 +12,15 @@
 </head>
 <body>
 
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <h2><i class="fa-solid fa-lock"></i> Warehouse Login</h2>
+            <p>Enter 4-Digit PIN</p>
+            <input type="password" id="pinInput" maxlength="4" placeholder="****">
+            <button onclick="checkPin()" class="btn-primary" style="width:100%; margin-top:10px;">Unlock</button>
+            <p id="loginError" style="color:#ef4444; display:none; margin-top:10px; font-weight:bold;">Incorrect PIN!</p>
+        </div>
+    </div>
     <nav class="navbar">
         <div class="logo"><i class="fa-solid fa-boxes-stacked"></i> Warehouse Inventory <span style="font-size:0.7em; color:#22c55e;">(Live Cloud)</span></div>
         <div class="nav-tools">
