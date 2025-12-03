@@ -264,8 +264,8 @@ document.getElementById('addNewBtn').onclick = () => {
     itemModal.style.display = "block";
 };
 
-// --- 4. NEW: LOGIN SYSTEM (CHANGE PIN HERE) ---
-const SECRET_PIN = "3647"; // <--- CHANGE THIS TO YOUR DESIRED PASSWORD
+// --- 4. NEW: LOGIN SYSTEM ---
+const SECRET_PIN = "3647"; // <--- CHANGE PASSWORD HERE
 
 window.checkPin = () => {
     const input = document.getElementById('pinInput').value;
@@ -273,11 +273,9 @@ window.checkPin = () => {
     const overlay = document.getElementById('loginOverlay');
     
     if (input === SECRET_PIN) {
-        // Correct Password
-        overlay.style.display = "none"; // Hide the lock screen
+        overlay.style.display = "none"; 
     } else {
-        // Wrong Password
         errorMsg.style.display = "block";
-        document.getElementById('pinInput').value = ""; // Clear input
+        document.getElementById('pinInput').value = ""; 
     }
 }

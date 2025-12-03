@@ -254,13 +254,15 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
 .history-table-wrapper table { min-width: 100%; }
 .history-table-wrapper th { background: #f8fafc; position: sticky; top: 0; z-index: 10;}
 
-/* --- NEW: LOGIN SCREEN STYLES --- */
+/* --- FIXED: LOGIN SCREEN STYLES --- */
 .login-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    position: fixed !important; /* Forces it to stay put */
+    top: 0; 
+    left: 0;
+    width: 100vw;  /* Covers full viewport width */
+    height: 100vh; /* Covers full viewport height */
     background: #1e293b; /* Dark Blue/Black */
-    z-index: 9999; /* Higher than everything else */
+    z-index: 10000; /* Extremely high number to sit on top of everything */
     display: flex;
     justify-content: center;
     align-items: center;
