@@ -12,7 +12,6 @@ const firebaseConfig = {
 };
 // ******************************************************
 
-// --- 2. INITIALIZE FIREBASE ---
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const dbRef = db.ref('inventory');
@@ -28,7 +27,6 @@ dbRef.on('value', (snapshot) => {
         inventory = data;
     }
     
-    // Migration check
     inventory.forEach(item => {
         if (!item.deliveryLog) item.deliveryLog = [];
     });
@@ -214,7 +212,8 @@ addForm.addEventListener('submit', (e) => {
         newItem.deliveryLog = inventory[editIndex].deliveryLog || []; 
         inventory[editIndex] = newItem;
     } else {
-        inventory.push(newItem);
+        // --- PRESERVED: Newest on Top ---
+        inventory.unshift(newItem);
     }
     saveData();
     closeAllModals();
@@ -259,13 +258,14 @@ searchInput.addEventListener('keyup', (e) => {
 document.getElementById('addNewBtn').onclick = () => {
     addForm.reset();
     editIndexInput.value = "-1";
+    document.getElementById('imgPreview').style.display = "none"; 
     document.getElementById('modalTitle').innerText = "Add New Product";
     document.getElementById('saveBtn').innerText = "Save Product";
     itemModal.style.display = "block";
 };
 
-// --- 4. NEW: LOGIN SYSTEM ---
-const SECRET_PIN = "3647"; // <--- CHANGE PASSWORD HERE
+// --- LOGIN SYSTEM ---
+const SECRET_PIN = "3647"; 
 
 window.checkPin = () => {
     const input = document.getElementById('pinInput').value;
@@ -279,27 +279,27 @@ window.checkPin = () => {
         document.getElementById('pinInput').value = ""; 
     }
 }
-// --- 5. NEW: AMAZON AUTO-FETCHER ---
+
+// --- 5. FIXED: AMAZON IMAGE FETCHER ---
 window.autoFillImage = () => {
     const asinInput = document.getElementById('prodSku');
     const imgInput = document.getElementById('prodImg');
     const preview = document.getElementById('imgPreview');
     
-    // Amazon ASINs are always 10 characters
+    // Clean up the ASIN input
     const asin = asinInput.value.trim();
     
     if (asin.length === 10) {
-        // This is the secret Amazon Image Pattern
+        // This is the classic, more robust Amazon image structure
         const amazonImageLink = `https://images-na.ssl-images-amazon.com/images/P/${asin}.01._SCLZZZZZZZ_.jpg`;
         
-        // Auto-fill the box
         imgInput.value = amazonImageLink;
-        
-        // Show a tiny preview so you know it worked
         preview.src = amazonImageLink;
         preview.style.display = "block";
     } else {
-        // If they delete the ASIN, clear the image
+        // We don't clear the input if it's less than 10, 
+        // in case you are pasting a manual link.
+        // We only hide the preview.
         preview.style.display = "none";
     }
 }
