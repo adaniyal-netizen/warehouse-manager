@@ -12,7 +12,7 @@
 
 body { background-color: var(--light); color: var(--dark); }
 
-/* --- FIXED: REMOVE BROWSER DEFAULT ARROWS FROM NUMBER INPUTS --- */
+/* --- REMOVE BROWSER DEFAULT ARROWS FROM NUMBER INPUTS --- */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -23,7 +23,7 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
-  appearance: textfield; /* This line fixes the compatibility warning */
+  appearance: textfield;
 }
 
 /* Navbar Styles */
@@ -134,13 +134,18 @@ th, td {
 
 th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;}
 
-/* Image Styling */
-/* FIXED: Image fits inside the box without zooming/cropping */
+/* Center Align the Status Column (3rd Column) */
+th:nth-child(3), td:nth-child(3) {
+    text-align: center;
+}
+
+/* --- FIXED: Image Styling --- */
+/* Changed to 'contain' so images don't get zoomed/cut off */
 .product-img {
     width: 60px;
     height: 60px;
-    object-fit: contain; /* Shows the whole image */
-    background-color: white; /* White background behind irregular shapes */
+    object-fit: contain; 
+    background-color: white;
     border-radius: 6px;
     border: 1px solid #eee;
 }
@@ -157,8 +162,8 @@ th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 0.9
     width: fit-content;
 }
 
-/* Direct Input Box for Stock */
-/* FIXED: Removes extra spacing so it aligns with buttons */
+/* --- FIXED: Stock Input Box --- */
+/* Added 'margin: 0' so it aligns perfectly with the buttons */
 .stock-input {
     width: 70px;
     padding: 5px;
@@ -167,7 +172,7 @@ th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 0.9
     border-radius: 4px;
     font-size: 1rem;
     font-weight: bold;
-    margin: 0; /* This forces the box to line up perfectly */
+    margin: 0; 
 }
 .stock-input:focus {
     border-color: var(--primary);
@@ -261,8 +266,3 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
 }
 .history-table-wrapper table { min-width: 100%; }
 .history-table-wrapper th { background: #f8fafc; position: sticky; top: 0; z-index: 10;}
-/* --- FIX: Center Align the Status Column --- */
-/* This targets the 3rd column (Status) specifically */
-th:nth-child(3), td:nth-child(3) {
-    text-align: center;
-}
