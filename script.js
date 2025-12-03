@@ -279,3 +279,27 @@ window.checkPin = () => {
         document.getElementById('pinInput').value = ""; 
     }
 }
+// --- 5. NEW: AMAZON AUTO-FETCHER ---
+window.autoFillImage = () => {
+    const asinInput = document.getElementById('prodSku');
+    const imgInput = document.getElementById('prodImg');
+    const preview = document.getElementById('imgPreview');
+    
+    // Amazon ASINs are always 10 characters
+    const asin = asinInput.value.trim();
+    
+    if (asin.length === 10) {
+        // This is the secret Amazon Image Pattern
+        const amazonImageLink = `https://images-na.ssl-images-amazon.com/images/P/${asin}.01._SCLZZZZZZZ_.jpg`;
+        
+        // Auto-fill the box
+        imgInput.value = amazonImageLink;
+        
+        // Show a tiny preview so you know it worked
+        preview.src = amazonImageLink;
+        preview.style.display = "block";
+    } else {
+        // If they delete the ASIN, clear the image
+        preview.style.display = "none";
+    }
+}

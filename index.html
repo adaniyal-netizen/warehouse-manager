@@ -58,15 +58,18 @@
                 <input type="hidden" id="editIndex" value="-1">
 
                 <label>Product Name</label>
-                <input type="text" id="prodName" required>
+                <input type="text" id="prodName" required placeholder="Paste Product Title...">
                 
-                <label>SKU / ID</label>
-                <input type="text" id="prodSku" required>
+                <label>ASIN (Amazon SKU)</label>
+                <input type="text" id="prodSku" required placeholder="e.g. B08N5KWB9H" oninput="autoFillImage()" maxlength="10">
 
-                <label>Image URL</label>
-                <input type="url" id="prodImg" placeholder="Paste image address here..." required>
+                <label>Image URL (Auto-Generated)</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="url" id="prodImg" placeholder="Image link will appear here..." required style="margin:0;">
+                    <img id="imgPreview" src="" style="width: 40px; height: 40px; border-radius: 4px; display: none; border: 1px solid #ccc;">
+                </div>
 
-                <label>Initial Available Quantity</label>
+                <label style="margin-top: 15px;">Initial Available Quantity</label>
                 <input type="number" id="prodAvail" value="0">
 
                 <button type="submit" class="btn-save" id="saveBtn">Save Product</button>
