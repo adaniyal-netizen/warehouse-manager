@@ -139,6 +139,7 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
     border-radius: 0 10px 10px 10px; 
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     overflow-x: auto; /* Allows scrolling if table gets too wide */
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iPhone */
 }
 
 table { width: 100%; border-collapse: collapse; min-width: 1000px; }
@@ -152,19 +153,17 @@ th, td {
 
 th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;}
 
-/* --- FIXED: COLUMN WIDTHS --- */
-/* This prevents columns from shrinking or expanding weirdly */
+/* COLUMN WIDTHS */
 th:nth-child(1) { width: 50px; text-align: center; } /* Star */
 th:nth-child(2) { width: 80px; } /* Image */
-th:nth-child(3) { width: auto; } /* Details (Takes remaining space) */
-th:nth-child(4) { width: 120px; text-align: center; } /* Status - FIXED WIDTH */
+th:nth-child(3) { width: auto; } /* Details */
+th:nth-child(4) { width: 120px; text-align: center; } /* Status */
 th:nth-child(5) { width: 180px; } /* Stock Control */
 th:nth-child(6) { width: 180px; } /* History */
 th:nth-child(7) { width: 100px; } /* Actions */
 
 /* Center Align Status Cells */
 td:nth-child(1), td:nth-child(4) { text-align: center; }
-
 
 /* Star Button Style */
 .btn-star {
@@ -180,7 +179,6 @@ td:nth-child(1), td:nth-child(4) { text-align: center; }
     filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.5));
 }
 .btn-star:hover { transform: scale(1.2); }
-
 
 /* Image Styling */
 .product-img {
@@ -248,7 +246,7 @@ td:nth-child(1), td:nth-child(4) { text-align: center; }
     font-size: 0.75rem; 
     font-weight: 700; 
     text-transform: uppercase;
-    white-space: nowrap; /* Forces text to stay on one line */
+    white-space: nowrap; 
 }
 .badge-ok { background: #dcfce7; color: #166534; }
 .badge-low { background: #fee2e2; color: #991b1b; }
@@ -343,4 +341,61 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
     letter-spacing: 15px;
     text-align: center;
     font-weight: bold;
+}
+
+/* --- NEW: MOBILE RESPONSIVENESS (PHONES) --- */
+@media (max-width: 768px) {
+    /* 1. Stack the Navbar Elements */
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+        gap: 15px;
+    }
+    .nav-tools {
+        width: 100%;
+        display: flex;
+        flex-direction: column; /* Stack Search & Add Button */
+    }
+    #searchInput {
+        width: 100%;
+    }
+    .btn-primary {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* 2. Squeeze the Table Font */
+    .container {
+        padding: 1rem;
+    }
+    th, td {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+    }
+    .product-img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* 3. Fix Login Screen on small phones */
+    .login-box {
+        width: 90%;
+        padding: 20px;
+    }
+    .login-box input {
+        font-size: 1.5rem;
+        letter-spacing: 5px;
+    }
+
+    /* 4. Ensure Modals fit */
+    .modal-content {
+        margin: 15% auto;
+        padding: 20px;
+        width: 95%;
+    }
+    .delivery-form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
