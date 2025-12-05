@@ -38,11 +38,11 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
     width: 250px;
 }
 
-/* NEW: TAB STYLES */
+/* TAB STYLES */
 .tabs-container {
     display: flex;
     gap: 10px;
-    margin-bottom: -10px; /* Pull closer to table */
+    margin-bottom: -10px; 
 }
 
 .tab-btn {
@@ -136,12 +136,12 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 
 .table-wrapper {
     background: white;
-    border-radius: 0 10px 10px 10px; /* Top-left sharp for tabs */
+    border-radius: 0 10px 10px 10px; 
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    overflow-x: auto;
+    overflow-x: auto; /* Allows scrolling if table gets too wide */
 }
 
-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+table { width: 100%; border-collapse: collapse; min-width: 1000px; }
 
 th, td {
     padding: 1rem;
@@ -152,8 +152,19 @@ th, td {
 
 th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;}
 
-/* Center Align Status (now 4th column) */
-th:nth-child(4), td:nth-child(4) { text-align: center; }
+/* --- FIXED: COLUMN WIDTHS --- */
+/* This prevents columns from shrinking or expanding weirdly */
+th:nth-child(1) { width: 50px; text-align: center; } /* Star */
+th:nth-child(2) { width: 80px; } /* Image */
+th:nth-child(3) { width: auto; } /* Details (Takes remaining space) */
+th:nth-child(4) { width: 120px; text-align: center; } /* Status - FIXED WIDTH */
+th:nth-child(5) { width: 180px; } /* Stock Control */
+th:nth-child(6) { width: 180px; } /* History */
+th:nth-child(7) { width: 100px; } /* Actions */
+
+/* Center Align Status Cells */
+td:nth-child(1), td:nth-child(4) { text-align: center; }
+
 
 /* Star Button Style */
 .btn-star {
@@ -161,11 +172,11 @@ th:nth-child(4), td:nth-child(4) { text-align: center; }
     border: none;
     font-size: 1.2rem;
     cursor: pointer;
-    color: #cbd5e1; /* Gray by default */
+    color: #cbd5e1; 
     transition: 0.2s;
 }
 .btn-star.starred {
-    color: var(--gold); /* Gold when active */
+    color: var(--gold); 
     filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.5));
 }
 .btn-star:hover { transform: scale(1.2); }
@@ -231,7 +242,14 @@ th:nth-child(4), td:nth-child(4) { text-align: center; }
 }
 
 /* Status Badges */
-.badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;}
+.badge { 
+    padding: 6px 12px; 
+    border-radius: 20px; 
+    font-size: 0.75rem; 
+    font-weight: 700; 
+    text-transform: uppercase;
+    white-space: nowrap; /* Forces text to stay on one line */
+}
 .badge-ok { background: #dcfce7; color: #166534; }
 .badge-low { background: #fee2e2; color: #991b1b; }
 
@@ -297,7 +315,7 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
 .history-table-wrapper table { min-width: 100%; }
 .history-table-wrapper th { background: #f8fafc; position: sticky; top: 0; z-index: 10;}
 
-/* --- LOGIN SCREEN STYLES --- */
+/* LOGIN SCREEN STYLES */
 .login-overlay {
     position: fixed !important; 
     top: 0; 

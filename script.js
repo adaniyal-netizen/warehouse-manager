@@ -17,7 +17,7 @@ const db = firebase.database();
 const dbRef = db.ref('inventory');
 
 let inventory = [];
-let currentFilter = 'all'; // 'all' or 'starred'
+let currentFilter = 'all'; 
 
 // --- 3. THE LISTENER ---
 dbRef.on('value', (snapshot) => {
@@ -28,13 +28,13 @@ dbRef.on('value', (snapshot) => {
         inventory = data;
     }
     
-    // Migration check: Ensure deliveryLog and isStarred exist
+    // Migration check
     inventory.forEach(item => {
         if (!item.deliveryLog) item.deliveryLog = [];
-        if (item.isStarred === undefined) item.isStarred = false; // Add default false
+        if (item.isStarred === undefined) item.isStarred = false; 
     });
     
-    refreshView(); // Re-render based on current tab
+    refreshView(); 
 });
 
 // --- SELECT ELEMENTS ---
@@ -59,11 +59,10 @@ function saveData() {
     });
 }
 
-// --- NEW: TAB SWITCHING ---
+// --- TAB SWITCHING ---
 window.switchTab = (mode) => {
     currentFilter = mode;
     
-    // Update button visual state
     if (mode === 'all') {
         tabAll.classList.add('active');
         tabStarred.classList.remove('active');
@@ -79,12 +78,10 @@ window.switchTab = (mode) => {
 function refreshView() {
     const term = searchInput.value.toLowerCase();
     
-    // Filter by Search Text
     let filtered = inventory.filter(item => 
         item.name.toLowerCase().includes(term) || item.sku.toLowerCase().includes(term)
     );
 
-    // If Starred Tab is active, filter again
     if (currentFilter === 'starred') {
         filtered = filtered.filter(item => item.isStarred === true);
     }
@@ -102,8 +99,7 @@ function renderTable(data) {
     }
 
     data.forEach((item) => {
-        // IMPORTANT: We must find the REAL index of this item in the main inventory
-        // otherwise editing/deleting while in "Starred" view will break everything.
+        // Find real index
         const realIndex = inventory.indexOf(item); 
 
         const totalDelivered = item.deliveryLog ? item.deliveryLog.reduce((sum, log) => sum + log.qty, 0) : 0;
@@ -119,7 +115,6 @@ function renderTable(data) {
         const statusClass = isLow ? 'badge-low' : 'badge-ok';
         const statusText = isLow ? 'Low Stock' : 'In Stock';
 
-        // Star Icon Logic
         const starClass = item.isStarred ? 'fa-solid starred' : 'fa-regular';
 
         const row = `
@@ -160,9 +155,8 @@ function renderTable(data) {
     });
 }
 
-// --- NEW: STAR TOGGLE ---
+// --- STAR TOGGLE ---
 window.toggleStar = (index) => {
-    // Flip the value (true -> false, false -> true)
     inventory[index].isStarred = !inventory[index].isStarred;
     saveData();
 };
@@ -268,12 +262,11 @@ addForm.addEventListener('submit', (e) => {
     };
 
     if (editIndex > -1) {
-        // IMPORTANT: We must preserve the existing Star Status when editing
         newItem.isStarred = inventory[editIndex].isStarred; 
         newItem.deliveryLog = inventory[editIndex].deliveryLog || []; 
         inventory[editIndex] = newItem;
     } else {
-        newItem.isStarred = false; // New items start un-starred
+        newItem.isStarred = false; 
         inventory.unshift(newItem);
     }
     saveData();
@@ -309,7 +302,7 @@ window.onclick = (e) => {
 };
 
 searchInput.addEventListener('keyup', (e) => {
-    refreshView(); // Use refreshView instead of calling renderTable directly
+    refreshView(); 
 });
 
 document.getElementById('addNewBtn').onclick = () => {
@@ -337,7 +330,14 @@ window.checkPin = () => {
     }
 }
 
-// --- AMAZON IMAGE FETCHER ---
+// --- NEW: LISTEN FOR 'ENTER' KEY ON LOGIN ---
+document.getElementById('pinInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        checkPin();
+    }
+});
+
+// --- UPDATED: AMAZON IMAGE FETCHER (Ad System) ---
 window.autoFillImage = () => {
     const asinInput = document.getElementById('prodSku');
     const imgInput = document.getElementById('prodImg');
@@ -345,7 +345,9 @@ window.autoFillImage = () => {
     const asin = asinInput.value.trim();
     
     if (asin.length === 10) {
-        const amazonImageLink = `https://images-na.ssl-images-amazon.com/images/P/${asin}.01._SCLZZZZZZZ_.jpg`;
+        // "ws-na.amazon-adsystem" is much more reliable than "images-na"
+        const amazonImageLink = `https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=${asin}&Format=_SL300_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1`;
+        
         imgInput.value = amazonImageLink;
         preview.src = amazonImageLink;
         preview.style.display = "block";
