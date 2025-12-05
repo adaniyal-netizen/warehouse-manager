@@ -340,79 +340,116 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
     font-weight: bold;
 }
 
-/* --- NEW: CARD VIEW FOR MOBILE (THE FIX) --- */
+/* --- FIXED: COMPACT CARD LAYOUT FOR MOBILE --- */
 @media (max-width: 768px) {
-    /* 1. Stack the Navbar */
-    .navbar { flex-direction: column; align-items: stretch; gap: 15px; padding: 15px; }
-    .nav-tools { width: 100%; flex-direction: column; }
+    /* Navbar: Compact Stack */
+    .navbar { flex-direction: column; gap: 10px; padding: 15px; }
+    .nav-tools { width: 100%; flex-direction: column; gap: 8px; }
     #searchInput { width: 100%; }
     .btn-primary { width: 100%; text-align: center; }
 
-    /* 2. KILL THE TABLE -> TRANSFORM TO CARDS */
+    /* RESET TABLE DISPLAY */
     .container { padding: 10px; }
-    
-    /* Hide the top header row completely */
-    thead { display: none; } 
-
-    /* Turn the table into a block */
+    thead { display: none; }
     table, tbody, th, td, tr { display: block; width: 100%; }
     
-    /* Turn each Row into a white "Card" box */
+    /* THE CARD CONTAINER */
     tr {
+        display: flex; /* Use Flexbox for Side-by-Side */
+        flex-wrap: wrap; /* Allow wrapping for bottom rows */
         background: white;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        padding: 15px;
-        position: relative; /* For positioning star */
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        padding: 10px;
+        position: relative;
     }
 
-    /* Style the cells inside the card */
-    td {
-        border: none;
-        border-bottom: 1px solid #f1f5f9;
-        padding: 10px 0;
-        text-align: center; /* Center everything */
-    }
-    
-    td:last-child { border-bottom: none; }
-
-    /* --- SPECIFIC CELL TWEAKS --- */
-    
-    /* 1. Star Button (Top Right Absolute) */
+    /* 1. STAR (Top Left Absolute) */
     td:nth-child(1) {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 5px; left: 5px;
         width: auto;
         padding: 0;
         border: none;
+        z-index: 10;
     }
 
-    /* 2. Image (Centered, Big) */
+    /* 2. IMAGE (Left, 30% Width) */
     td:nth-child(2) {
-        text-align: center;
-        padding-top: 20px;
-    }
-    .product-img { width: 100px; height: 100px; }
-
-    /* 3. Product Title (Big Text) */
-    td:nth-child(3) { font-size: 1.1rem; }
-    
-    /* 4. Add "Labels" back since headers are gone */
-    td:nth-child(4)::before { content: "Status: "; font-weight: bold; color: #94a3b8; }
-    td:nth-child(5)::before { content: "Stock: "; font-weight: bold; color: #94a3b8; display: block; margin-bottom: 5px; }
-    td:nth-child(6)::before { content: "History: "; font-weight: bold; color: #94a3b8; display: block; margin-bottom: 5px; }
-    
-    /* 5. Center Stock Controls */
-    .stock-control { margin: 0 auto; }
-    
-    /* 6. Actions (Buttons at bottom) */
-    td:nth-child(7) {
+        width: 30%;
+        border: none;
+        padding: 0;
         display: flex;
+        align-items: center;
         justify-content: center;
-        gap: 15px;
-        margin-top: 10px;
+    }
+    .product-img { width: 100%; max-height: 80px; object-fit: contain; }
+
+    /* 3. DETAILS (Right, 70% Width) */
+    td:nth-child(3) {
+        width: 70%;
+        border: none;
+        padding: 0 0 0 10px; /* Left padding to separate from image */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    /* Force Title Font Size Down */
+    td:nth-child(3) div:first-child { font-size: 0.95rem; line-height: 1.2; margin-bottom: 5px; } 
+    td:nth-child(3) div:last-child { font-size: 0.75rem; } /* SKU */
+
+    /* 4. STATUS (Absolute Top Right of Details? No, let's put it below Image) */
+    td:nth-child(4) { 
+        width: 100%; 
+        border: none; 
+        padding: 8px 0 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    /* Add Label for Status */
+    td:nth-child(4)::before { content: "Status:"; font-size: 0.8rem; color: #888; margin-right: 5px; }
+
+    /* 5. STOCK CONTROL (Full Row) */
+    td:nth-child(5) { 
+        width: 100%;
+        border: none;
+        padding: 10px 0;
+        border-top: 1px dashed #eee;
+        border-bottom: 1px dashed #eee;
+        margin: 5px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    td:nth-child(5)::before { content: "Current Stock:"; font-weight: bold; font-size: 0.9rem; color: #475569; }
+
+    /* 6. HISTORY (Hidden Label, just button) */
+    td:nth-child(6) { 
+        width: 100%; 
+        border: none; 
+        padding: 5px 0;
+        text-align: center;
+    }
+    .delivery-cell { align-items: stretch; }
+    .total-delivered { display: none; } /* Hide total count on mobile to save space */
+    .last-updated { display: none; } /* Hide date to save space */
+    .btn-log { width: 100%; justify-content: center; padding: 8px; }
+
+    /* 7. ACTIONS (Bottom Row) */
+    td:nth-child(7) {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+        padding-top: 5px;
+        border: none;
+    }
+    td:nth-child(7) button {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #eee;
+        border-radius: 6px;
     }
 }
