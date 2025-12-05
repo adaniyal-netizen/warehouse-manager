@@ -138,8 +138,7 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
     background: white;
     border-radius: 0 10px 10px 10px; 
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    overflow-x: auto; /* Allows scrolling if table gets too wide */
-    -webkit-overflow-scrolling: touch; /* Smooth scroll on iPhone */
+    overflow-x: auto; 
 }
 
 table { width: 100%; border-collapse: collapse; min-width: 1000px; }
@@ -162,7 +161,6 @@ th:nth-child(5) { width: 180px; } /* Stock Control */
 th:nth-child(6) { width: 180px; } /* History */
 th:nth-child(7) { width: 100px; } /* Actions */
 
-/* Center Align Status Cells */
 td:nth-child(1), td:nth-child(4) { text-align: center; }
 
 /* Star Button Style */
@@ -202,7 +200,6 @@ td:nth-child(1), td:nth-child(4) { text-align: center; }
     width: fit-content;
 }
 
-/* Stock Input Box */
 .stock-input {
     width: 70px;
     padding: 5px;
@@ -343,59 +340,79 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
     font-weight: bold;
 }
 
-/* --- NEW: MOBILE RESPONSIVENESS (PHONES) --- */
+/* --- NEW: CARD VIEW FOR MOBILE (THE FIX) --- */
 @media (max-width: 768px) {
-    /* 1. Stack the Navbar Elements */
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 1rem;
-        gap: 15px;
-    }
-    .nav-tools {
-        width: 100%;
-        display: flex;
-        flex-direction: column; /* Stack Search & Add Button */
-    }
-    #searchInput {
-        width: 100%;
-    }
-    .btn-primary {
-        width: 100%;
-        text-align: center;
+    /* 1. Stack the Navbar */
+    .navbar { flex-direction: column; align-items: stretch; gap: 15px; padding: 15px; }
+    .nav-tools { width: 100%; flex-direction: column; }
+    #searchInput { width: 100%; }
+    .btn-primary { width: 100%; text-align: center; }
+
+    /* 2. KILL THE TABLE -> TRANSFORM TO CARDS */
+    .container { padding: 10px; }
+    
+    /* Hide the top header row completely */
+    thead { display: none; } 
+
+    /* Turn the table into a block */
+    table, tbody, th, td, tr { display: block; width: 100%; }
+    
+    /* Turn each Row into a white "Card" box */
+    tr {
+        background: white;
+        margin-bottom: 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        padding: 15px;
+        position: relative; /* For positioning star */
     }
 
-    /* 2. Squeeze the Table Font */
-    .container {
-        padding: 1rem;
-    }
-    th, td {
-        padding: 0.6rem;
-        font-size: 0.85rem;
-    }
-    .product-img {
-        width: 40px;
-        height: 40px;
+    /* Style the cells inside the card */
+    td {
+        border: none;
+        border-bottom: 1px solid #f1f5f9;
+        padding: 10px 0;
+        text-align: center; /* Center everything */
     }
     
-    /* 3. Fix Login Screen on small phones */
-    .login-box {
-        width: 90%;
-        padding: 20px;
-    }
-    .login-box input {
-        font-size: 1.5rem;
-        letter-spacing: 5px;
+    td:last-child { border-bottom: none; }
+
+    /* --- SPECIFIC CELL TWEAKS --- */
+    
+    /* 1. Star Button (Top Right Absolute) */
+    td:nth-child(1) {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: auto;
+        padding: 0;
+        border: none;
     }
 
-    /* 4. Ensure Modals fit */
-    .modal-content {
-        margin: 15% auto;
-        padding: 20px;
-        width: 95%;
+    /* 2. Image (Centered, Big) */
+    td:nth-child(2) {
+        text-align: center;
+        padding-top: 20px;
     }
-    .delivery-form-row {
-        flex-direction: column;
-        align-items: stretch;
+    .product-img { width: 100px; height: 100px; }
+
+    /* 3. Product Title (Big Text) */
+    td:nth-child(3) { font-size: 1.1rem; }
+    
+    /* 4. Add "Labels" back since headers are gone */
+    td:nth-child(4)::before { content: "Status: "; font-weight: bold; color: #94a3b8; }
+    td:nth-child(5)::before { content: "Stock: "; font-weight: bold; color: #94a3b8; display: block; margin-bottom: 5px; }
+    td:nth-child(6)::before { content: "History: "; font-weight: bold; color: #94a3b8; display: block; margin-bottom: 5px; }
+    
+    /* 5. Center Stock Controls */
+    .stock-control { margin: 0 auto; }
+    
+    /* 6. Actions (Buttons at bottom) */
+    td:nth-child(7) {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 10px;
     }
 }
