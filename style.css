@@ -340,116 +340,93 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
     font-weight: bold;
 }
 
-/* --- FIXED: COMPACT CARD LAYOUT FOR MOBILE --- */
+/* --- MOBILE LAYOUT V4 (GRID SYSTEM) --- */
 @media (max-width: 768px) {
-    /* Navbar: Compact Stack */
-    .navbar { flex-direction: column; gap: 10px; padding: 15px; }
-    .nav-tools { width: 100%; flex-direction: column; gap: 8px; }
+    /* 1. Header Stack */
+    .navbar { flex-direction: column; padding: 10px; gap: 10px; }
+    .nav-tools { width: 100%; flex-direction: column; gap: 5px; }
     #searchInput { width: 100%; }
-    .btn-primary { width: 100%; text-align: center; }
+    .btn-primary { width: 100%; }
 
-    /* RESET TABLE DISPLAY */
+    /* 2. Break Table completely */
     .container { padding: 10px; }
-    thead { display: none; }
-    table, tbody, th, td, tr { display: block; width: 100%; }
-    
-    /* THE CARD CONTAINER */
+    table, thead, tbody, th, td, tr { display: block; width: 100%; }
+    thead { display: none; } /* Hide headers */
+
+    /* 3. Card Container */
     tr {
-        display: flex; /* Use Flexbox for Side-by-Side */
-        flex-wrap: wrap; /* Allow wrapping for bottom rows */
         background: white;
-        margin-bottom: 12px;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         padding: 10px;
-        position: relative;
+        display: grid; 
+        /* GRID LAYOUT: [Star] [Image] [Title] */
+        grid-template-columns: 80px 1fr;
+        grid-template-areas: 
+            "image star"
+            "image title"
+            "status status"
+            "stock stock"
+            "actions actions";
+        gap: 5px;
+        border: 1px solid #eee;
     }
 
-    /* 1. STAR (Top Left Absolute) */
+    /* 4. Assign Cells to Grid Areas */
+    
+    /* Image (Top Left) */
+    td:nth-child(2) { 
+        grid-area: image; 
+        padding: 0; border: none; 
+        display: flex; align-items: flex-start; justify-content: center;
+    }
+    .product-img { width: 70px; height: 70px; object-fit: contain; }
+
+    /* Star (Top Right) */
     td:nth-child(1) {
-        position: absolute;
-        top: 5px; left: 5px;
-        width: auto;
-        padding: 0;
-        border: none;
-        z-index: 10;
+        grid-area: star;
+        padding: 0; border: none;
+        text-align: right;
     }
 
-    /* 2. IMAGE (Left, 30% Width) */
-    td:nth-child(2) {
-        width: 30%;
-        border: none;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .product-img { width: 100%; max-height: 80px; object-fit: contain; }
-
-    /* 3. DETAILS (Right, 70% Width) */
+    /* Title (Right of Image) */
     td:nth-child(3) {
-        width: 70%;
-        border: none;
-        padding: 0 0 0 10px; /* Left padding to separate from image */
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        grid-area: title;
+        padding: 0; border: none;
+        font-size: 0.95rem; line-height: 1.2;
     }
-    /* Force Title Font Size Down */
-    td:nth-child(3) div:first-child { font-size: 0.95rem; line-height: 1.2; margin-bottom: 5px; } 
-    td:nth-child(3) div:last-child { font-size: 0.75rem; } /* SKU */
+    /* Hide SKU on mobile to save space */
+    td:nth-child(3) div:last-child { font-size: 0.75rem; color: #888; margin-top: 2px; }
 
-    /* 4. STATUS (Absolute Top Right of Details? No, let's put it below Image) */
-    td:nth-child(4) { 
-        width: 100%; 
-        border: none; 
-        padding: 8px 0 0 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    /* Status Bar */
+    td:nth-child(4) {
+        grid-area: status;
+        border: none; padding: 8px 0 0 0;
+        display: flex; justify-content: space-between; align-items: center;
+        border-top: 1px dashed #eee; margin-top: 5px;
     }
-    /* Add Label for Status */
-    td:nth-child(4)::before { content: "Status:"; font-size: 0.8rem; color: #888; margin-right: 5px; }
+    td:nth-child(4)::before { content: "Status:"; font-size: 0.8rem; color: #888; }
 
-    /* 5. STOCK CONTROL (Full Row) */
-    td:nth-child(5) { 
-        width: 100%;
-        border: none;
-        padding: 10px 0;
-        border-top: 1px dashed #eee;
-        border-bottom: 1px dashed #eee;
-        margin: 5px 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    /* Stock Control */
+    td:nth-child(5) {
+        grid-area: stock;
+        border: none; padding: 5px 0;
+        display: flex; justify-content: space-between; align-items: center;
     }
-    td:nth-child(5)::before { content: "Current Stock:"; font-weight: bold; font-size: 0.9rem; color: #475569; }
+    td:nth-child(5)::before { content: "Stock:"; font-size: 0.9rem; font-weight: bold; }
 
-    /* 6. HISTORY (Hidden Label, just button) */
-    td:nth-child(6) { 
-        width: 100%; 
-        border: none; 
-        padding: 5px 0;
-        text-align: center;
-    }
-    .delivery-cell { align-items: stretch; }
-    .total-delivered { display: none; } /* Hide total count on mobile to save space */
-    .last-updated { display: none; } /* Hide date to save space */
-    .btn-log { width: 100%; justify-content: center; padding: 8px; }
+    /* Hide History on Mobile */
+    td:nth-child(6) { display: none; }
 
-    /* 7. ACTIONS (Bottom Row) */
+    /* Actions (Bottom) */
     td:nth-child(7) {
-        width: 100%;
-        display: flex;
-        gap: 10px;
-        padding-top: 5px;
-        border: none;
+        grid-area: actions;
+        border: none; padding-top: 5px;
+        display: flex; gap: 5px;
     }
     td:nth-child(7) button {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid #eee;
-        border-radius: 6px;
+        flex: 1; padding: 10px;
+        border: 1px solid #eee; border-radius: 6px;
     }
 }
