@@ -340,42 +340,42 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
     font-weight: bold;
 }
 
-/* --- MOBILE LAYOUT V4 (GRID SYSTEM) --- */
+/* --- FIXED MOBILE LAYOUT V6 (NO HORIZONTAL SCROLL) --- */
 @media (max-width: 768px) {
-    /* 1. Header Stack */
-    .navbar { flex-direction: column; padding: 10px; gap: 10px; }
-    .nav-tools { width: 100%; flex-direction: column; gap: 5px; }
+    /* Navbar: Compact Stack */
+    .navbar { flex-direction: column; gap: 10px; padding: 15px; }
+    .nav-tools { width: 100%; flex-direction: column; gap: 8px; }
     #searchInput { width: 100%; }
     .btn-primary { width: 100%; }
 
-    /* 2. Break Table completely */
+    /* CRITICAL FIX: Kill the 1000px table limit */
+    table { min-width: 0 !important; width: 100% !important; }
+    
     .container { padding: 10px; }
-    table, thead, tbody, th, td, tr { display: block; width: 100%; }
-    thead { display: none; } /* Hide headers */
-
-    /* 3. Card Container */
+    thead { display: none; }
+    
+    /* Elements to block */
+    tbody, th, td, tr { display: block; width: 100%; }
+    
+    /* THE CARD */
     tr {
         background: white;
         margin-bottom: 15px;
         border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
         padding: 10px;
         display: grid; 
-        /* GRID LAYOUT: [Star] [Image] [Title] */
-        grid-template-columns: 80px 1fr;
+        grid-template-columns: 80px 1fr; /* Image | Title */
         grid-template-areas: 
             "image star"
             "image title"
-            "status status"
             "stock stock"
-            "actions actions";
-        gap: 5px;
+            "status actions"; /* Status left, Actions right */
+        gap: 8px;
         border: 1px solid #eee;
     }
 
-    /* 4. Assign Cells to Grid Areas */
-    
-    /* Image (Top Left) */
+    /* 1. Image (Top Left) */
     td:nth-child(2) { 
         grid-area: image; 
         padding: 0; border: none; 
@@ -383,50 +383,54 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
     }
     .product-img { width: 70px; height: 70px; object-fit: contain; }
 
-    /* Star (Top Right) */
+    /* 2. Star (Top Right) */
     td:nth-child(1) {
         grid-area: star;
         padding: 0; border: none;
         text-align: right;
     }
 
-    /* Title (Right of Image) */
+    /* 3. Title (Right of Image) */
     td:nth-child(3) {
         grid-area: title;
         padding: 0; border: none;
         font-size: 0.95rem; line-height: 1.2;
     }
-    /* Hide SKU on mobile to save space */
-    td:nth-child(3) div:last-child { font-size: 0.75rem; color: #888; margin-top: 2px; }
+    td:nth-child(3) div:last-child { display: none; } /* Hide SKU to save space */
 
-    /* Status Bar */
-    td:nth-child(4) {
-        grid-area: status;
-        border: none; padding: 8px 0 0 0;
-        display: flex; justify-content: space-between; align-items: center;
-        border-top: 1px dashed #eee; margin-top: 5px;
-    }
-    td:nth-child(4)::before { content: "Status:"; font-size: 0.8rem; color: #888; }
-
-    /* Stock Control */
+    /* 4. STOCK (Big Center Row) - THIS IS THE INPUT AREA */
     td:nth-child(5) {
         grid-area: stock;
-        border: none; padding: 5px 0;
+        border: none; padding: 10px;
+        background: #f8fafc; /* Light gray background to pop */
+        border-radius: 6px;
         display: flex; justify-content: space-between; align-items: center;
     }
-    td:nth-child(5)::before { content: "Stock:"; font-size: 0.9rem; font-weight: bold; }
+    td:nth-child(5)::before { content: "Stock Level:"; font-weight: bold; font-size: 0.9rem; color: #475569; }
+    
+    /* Make stock controls BIGGER on mobile */
+    .stock-control { gap: 15px; }
+    .btn-icon { width: 35px; height: 35px; font-size: 1.2rem; }
 
-    /* Hide History on Mobile */
-    td:nth-child(6) { display: none; }
+    /* 5. Status (Bottom Left) */
+    td:nth-child(4) {
+        grid-area: status;
+        border: none; padding: 0;
+        display: flex; align-items: center;
+    }
+    td:nth-child(4)::before { display: none; } /* No label, just the badge */
 
-    /* Actions (Bottom) */
+    /* 6. Actions (Bottom Right) */
     td:nth-child(7) {
         grid-area: actions;
-        border: none; padding-top: 5px;
-        display: flex; gap: 5px;
+        border: none; padding: 0;
+        display: flex; gap: 5px; justify-content: flex-end;
     }
     td:nth-child(7) button {
-        flex: 1; padding: 10px;
+        flex: unset; width: 40px; height: 40px; /* Square buttons */
         border: 1px solid #eee; border-radius: 6px;
     }
+
+    /* Hide History completely */
+    td:nth-child(6) { display: none; }
 }
