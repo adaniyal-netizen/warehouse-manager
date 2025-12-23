@@ -154,7 +154,7 @@ function renderTable(data) {
                 </td>
 
                 <td>
-                    <button onclick="deleteItem(${realIndex})" class="btn-icon" style="color: #ef4444;"><i class="fa-solid fa-trash"></i></button>
+                    <button onclick="removeDamageReport(${realIndex})" class="btn-icon" style="color: #ef4444;"><i class="fa-solid fa-trash"></i></button>
                 </td>
             </tr>`;
         } else {
@@ -388,3 +388,17 @@ window.autoFillImage = () => {
         document.getElementById('imgPreview').style.display = "block";
     }
 }
+// --- NEW FUNCTION: REMOVE ONLY DAMAGE REPORT ---
+window.removeDamageReport = (index) => {
+    if(confirm('Remove this item from the Damaged list? \n(The product will remain in All Inventory)')) {
+        // We set damaged to 0, which removes it from this filter
+        inventory[index].damaged = 0;
+        
+        // Optional: Reset return info so it's clean for next time
+        inventory[index].returnId = "";
+        inventory[index].returnStatus = "Pending";
+        inventory[index].damagedImg = "";
+        
+        saveData();
+    }
+};

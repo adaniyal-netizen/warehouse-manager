@@ -157,7 +157,7 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
     tr.damaged-row td:nth-child(4) { grid-area: method; display: block; border:none; padding:0;} 
     tr.damaged-row td:nth-child(5) { grid-area: status; display: block; border:none; padding:0;} 
     
-    td:nth-child(5) { grid-area: stock; border: none; padding: 10px; background: #f8fafc; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+    td:nth-child(5) { grid-area: stock; border: none; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
     td:nth-child(5)::before { content: "Stock Level:"; font-weight: bold; font-size: 0.9rem; color: #475569; }
     .stock-control { gap: 15px; } 
     .btn-icon { width: 35px; height: 35px; font-size: 1.2rem; }
