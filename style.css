@@ -193,3 +193,63 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
     .longheld-row td:nth-child(5) { grid-area: qty; background:#f5f3ff; border:none; padding:10px; text-align:center; font-weight:bold; color:#5b21b6;}
     .longheld-row td:nth-child(6) { grid-area: actions; border:none; }
 }
+/* --- FIX 1: SCROLLABLE TABS ON MOBILE --- */
+@media (max-width: 768px) {
+    .tabs-container {
+        overflow-x: auto;      /* Enable horizontal scrolling */
+        flex-wrap: nowrap;     /* Prevent wrapping/stacking */
+        gap: 10px;             /* Space between buttons */
+        padding-bottom: 5px;   /* Room for scrollbar */
+        -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+    }
+
+    /* Hide the ugly scrollbar but keep functionality */
+    .tabs-container::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+        flex: 0 0 auto;       /* Stop buttons from shrinking/squishing */
+        white-space: nowrap;  /* Keep text on one line */
+        font-size: 0.9rem;
+        padding: 10px 15px;
+    }
+
+    /* --- FIX 2: LONG HELD CARD LAYOUT --- */
+    /* Force the Long-Held items to look like neat cards */
+    tr.longheld-row {
+        display: grid !important;
+        grid-template-columns: 80px 1fr !important;
+        grid-template-areas:
+            "image note"
+            "image date"
+            "qty qty"
+            "actions actions" !important;
+        gap: 8px;
+    }
+
+    /* Map cells to the areas */
+    .longheld-row td:nth-child(1) { display: none; } /* Hide # number */
+    .longheld-row td:nth-child(2) { grid-area: image; padding:0; border:none; display:flex; align-items:flex-start; }
+    .longheld-row td:nth-child(3) { grid-area: note; padding:0; border:none; font-weight:bold; font-size:1rem; align-self: center;}
+    .longheld-row td:nth-child(4) { grid-area: date; padding:0; border:none; font-size:0.8rem; color:#888; }
+    
+    /* The Purple Quantity Box */
+    .longheld-row td:nth-child(5) { 
+        grid-area: qty; 
+        background: #f5f3ff; 
+        border-radius: 6px; 
+        padding: 10px; 
+        text-align: center; 
+        font-weight: bold; 
+        color: #5b21b6; 
+        font-size: 1.1rem;
+        margin-top: 5px;
+    }
+    
+    .longheld-row td:nth-child(6) { 
+        grid-area: actions; 
+        border: none; 
+        display: flex; 
+        justify-content: flex-end;
+        padding-top: 5px;
+    }
+}

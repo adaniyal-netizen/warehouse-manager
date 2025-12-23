@@ -363,13 +363,24 @@ window.openEditModal = (index) => {
     itemModal.style.display = "block";
 };
 window.deleteItem = (index) => { if(confirm('Delete this product?')) { inventory.splice(index, 1); saveData(); } };
+// --- FIXED: CLOSE ALL MODALS (INCLUDING NEW LONG HELD) ---
 window.closeAllModals = () => {
     itemModal.style.display = "none";
     deliveryModal.style.display = "none";
     damageModal.style.display = "none";
+    // This was missing:
+    document.getElementById('longHeldModal').style.display = "none"; 
 };
-window.onclick = (e) => { if (e.target == itemModal || e.target == deliveryModal || e.target == damageModal) closeAllModals(); };
-searchInput.addEventListener('keyup', (e) => { refreshView(); });
+
+// --- CLICK OUTSIDE TO CLOSE ---
+window.onclick = (e) => { 
+    if (e.target == itemModal || 
+        e.target == deliveryModal || 
+        e.target == damageModal || 
+        e.target == document.getElementById('longHeldModal')) { 
+        closeAllModals(); 
+    } 
+};searchInput.addEventListener('keyup', (e) => { refreshView(); });
 document.getElementById('addNewBtn').onclick = () => {
     if (currentFilter === 'longheld') {
         // OPEN NEW SIMPLE MODAL
