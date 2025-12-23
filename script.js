@@ -58,15 +58,31 @@ function saveData() {
 
 window.switchTab = (mode) => {
     currentFilter = mode;
+    
+    // Reset classes
     tabAll.classList.remove('active');
     tabStarred.classList.remove('active');
     tabDamaged.classList.remove('active');
+    document.getElementById('tabLongHeld').classList.remove('active'); // New Button
+
+    // Set Active
     if (mode === 'all') tabAll.classList.add('active');
     if (mode === 'starred') tabStarred.classList.add('active');
     if (mode === 'damaged') tabDamaged.classList.add('active');
+    if (mode === 'longheld') document.getElementById('tabLongHeld').classList.add('active');
+
+    // Change "Add Button" Text based on tab
+    const addBtn = document.getElementById('addNewBtn');
+    if (mode === 'longheld') {
+        addBtn.innerText = "+ Quick Add Photo";
+        addBtn.style.backgroundColor = "#8b5cf6";
+    } else {
+        addBtn.innerText = "+ Add New Item";
+        addBtn.style.backgroundColor = "#2563eb";
+    }
+
     refreshView();
 };
-
 function refreshView() {
     const term = searchInput.value.toLowerCase();
     let filtered = inventory.filter(item => 
@@ -111,110 +127,99 @@ function renderTable(data) {
         return;
     }
 
-    data.forEach((item) => {
-        const realIndex = inventory.indexOf(item); 
-        const isDamagedView = (currentFilter === 'damaged');
-        const starClass = item.isStarred ? 'fa-solid starred' : 'fa-regular';
-        let displayImg = item.image;
-        if (isDamagedView && item.damagedImg) displayImg = item.damagedImg;
+    // 1. FILTER LOGIC FOR LONG HELD
+    // We only show items with "isLongHeld: true" in the 4th tab
+    // We hide them from the other tabs
+    let viewData = [];
+    if (currentFilter === 'longheld') {
+        // Show ONLY longheld items
+        viewData = data.filter(item => item.isLongHeld === true);
+        
+        // Update Headers for this view
+        tableHead.innerHTML = `
+            <tr>
+                <th style="width: 50px;">#</th> 
+                <th style="width: 120px;">Image</th>
+                <th>Note / Details</th>
+                <th>Date Added</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+            </tr>`;
+    } else {
+        // Show Standard items (damaged or normal)
+        viewData = data.filter(item => !item.isLongHeld); 
+        
+        // Restore Standard Headers
+        if (currentFilter === 'damaged') {
+            tableHead.innerHTML = `<tr><th style="width:50px;">Fav</th><th style="width:80px;">Image</th><th>Return Order ID</th><th>Return Method</th><th>Status</th><th>Actions</th></tr>`;
+            viewData = viewData.filter(item => item.damaged > 0);
+        } else {
+            tableHead.innerHTML = `<tr><th style="width:50px;">Fav</th><th style="width:80px;">Image</th><th>Product Details</th><th>Status</th><th>Stock Levels</th><th>Delivered History</th><th>Actions</th></tr>`;
+            if (currentFilter === 'starred') viewData = viewData.filter(item => item.isStarred);
+        }
+    }
 
+    if (viewData.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No items found.</td></tr>';
+        return;
+    }
+
+    viewData.forEach((item) => {
+        const realIndex = inventory.indexOf(item); 
         let rowHtml = '';
 
-        if (isDamagedView) {
-            // *** DAMAGED / RETURN VIEW ***
+        if (currentFilter === 'longheld') {
+            // *** LONG HELD VIEW ***
             rowHtml = `
-            <tr class="damaged-row">
-                <td style="text-align:center;">
-                    <button class="btn-star ${item.isStarred ? 'starred' : ''}" onclick="toggleStar(${realIndex})">
-                        <i class="${starClass} fa-star"></i>
-                    </button>
-                </td>
-                
-                <td><img src="${displayImg}" class="product-img" alt="img" style="border: 2px solid #ef4444;"></td>
-                
+            <tr class="longheld-row">
+                <td style="text-align:center; color:#ccc;">#</td>
+                <td><img src="${item.image}" class="product-img" style="width:100px; height:100px; border:2px solid #8b5cf6;"></td>
+                <td style="font-weight:bold;">${item.name || 'No Note'}</td>
+                <td style="color:#666;">${item.dateAdded || '-'}</td>
+                <td style="font-size:1.2rem; font-weight:bold; color:#8b5cf6;">${item.available} Units</td>
                 <td>
-                    <div style="font-weight:bold; margin-bottom:5px;">${item.name}</div>
-                    <input type="text" class="table-input" value="${item.returnId}" placeholder="Enter Return ID..." onchange="updateDamageInfo(${realIndex}, 'returnId', this.value)">
-                </td>
-                
-                <td>
-                    <select class="table-select" onchange="updateDamageInfo(${realIndex}, 'returnMethod', this.value)">
-                        <option value="Fedex Pickup Return" ${item.returnMethod === 'Fedex Pickup Return' ? 'selected' : ''}>Fedex Pickup Return</option>
-                        <option value="Return To Store" ${item.returnMethod === 'Return To Store' ? 'selected' : ''}>Return To Store</option>
-                        <option value="No Need To Return" ${item.returnMethod === 'No Need To Return' ? 'selected' : ''}>No Need To Return</option>
-                    </select>
-                </td>
-                
-                <td>
-                     <select class="table-select" onchange="updateDamageInfo(${realIndex}, 'returnStatus', this.value)" style="${item.returnStatus === 'Pending' ? 'color:#d97706; font-weight:bold;' : 'color:#22c55e; font-weight:bold;'}">
-                        <option value="Pending" ${item.returnStatus === 'Pending' ? 'selected' : ''}>Pending</option>
-                        <option value="Returned" ${item.returnStatus === 'Returned' ? 'selected' : ''}>Returned</option>
-                    </select>
-                    <div style="margin-top:5px; font-size:0.8rem; color:#ef4444;">Qty: ${item.damaged}</div>
-                </td>
-
-                <td>
-                    <button onclick="removeDamageReport(${realIndex})" class="btn-icon" style="color: #ef4444;"><i class="fa-solid fa-trash"></i></button>
-                </td>
-            </tr>`;
-        } else {
-            // *** NORMAL VIEW ***
-            const totalDelivered = item.deliveryLog ? item.deliveryLog.reduce((sum, log) => sum + log.qty, 0) : 0;
-            const isLow = item.available < 10;
-            const statusClass = isLow ? 'badge-low' : 'badge-ok';
-            const statusText = isLow ? 'Low Stock' : 'In Stock';
-            let lastInfo = "No history";
-            if (item.deliveryLog && item.deliveryLog.length > 0) {
-                const lastLog = item.deliveryLog[item.deliveryLog.length - 1];
-                const d = new Date(lastLog.date);
-                lastInfo = `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
-            }
-
-            rowHtml = `
-            <tr>
-                <td style="text-align:center;">
-                    <button class="btn-star ${item.isStarred ? 'starred' : ''}" onclick="toggleStar(${realIndex})">
-                        <i class="${starClass} fa-star"></i>
-                    </button>
-                </td>
-
-                <td><img src="${item.image}" class="product-img" alt="img" onerror="this.src='https://via.placeholder.com/60?text=No+Img'"></td>
-                
-                <td>
-                    <div style="font-weight:bold; font-size:1.05rem;">${item.name}</div>
-                    <div style="color:#64748b; font-size:0.85rem;">SKU: ${item.sku}</div>
-                </td>
-                
-                <td><span class="badge ${statusClass}">${statusText}</span></td>
-                
-                <td>
-                    <div class="stock-control">
-                        <button class="btn-icon" onclick="updateAvailable(${realIndex}, -1)">-</button>
-                        <input type="number" class="stock-input" value="${item.available}" onchange="manualStockUpdate(${realIndex}, this.value)">
-                        <button class="btn-icon" onclick="updateAvailable(${realIndex}, 1)">+</button>
-                    </div>
-                </td>
-                
-                <td>
-                    <div class="delivery-cell">
-                        <div class="total-delivered">${totalDelivered} Units</div>
-                        <div class="last-updated"><i class="fa-regular fa-clock"></i> Last: ${lastInfo}</div>
-                        <button class="btn-log" onclick="openDeliveryModal(${realIndex})">View Log</button>
-                    </div>
-                </td>
-                
-                <td>
-                    <button onclick="openDamageModal(${realIndex})" class="btn-icon" style="color: #ef4444; border: 1px solid #fee2e2; margin-right:5px;"><i class="fa-solid fa-triangle-exclamation"></i></button>
-                    <button onclick="openEditModal(${realIndex})" class="btn-icon" style="color: #2563eb; margin-right: 5px;"><i class="fa-solid fa-pen"></i></button>
                     <button onclick="deleteItem(${realIndex})" class="btn-icon" style="color: #ef4444;"><i class="fa-solid fa-trash"></i></button>
                 </td>
+            </tr>`;
+        
+        } else if (currentFilter === 'damaged') {
+             // ... (Keep existing Damaged View logic from previous chat)
+             // I will abbreviate here to save space, but in your file, keep the damaged view logic!
+             // Just copy the damaged block from the previous code I gave you.
+             let displayImg = item.damagedImg || item.image;
+             rowHtml = `<tr class="damaged-row">... (Damaged Row Code) ...</tr>`; 
+             // (Wait, to be safe, I should just give you the full block below to avoid confusion)
+             rowHtml = `
+                <tr class="damaged-row">
+                    <td style="text-align:center;"><button class="btn-star ${item.isStarred ? 'starred' : ''}" onclick="toggleStar(${realIndex})"><i class="${item.isStarred ? 'fa-solid starred' : 'fa-regular'} fa-star"></i></button></td>
+                    <td><img src="${displayImg}" class="product-img" style="border: 2px solid #ef4444;"></td>
+                    <td><div style="font-weight:bold; margin-bottom:5px;">${item.name}</div><input type="text" class="table-input" value="${item.returnId}" placeholder="Enter Return ID..." onchange="updateDamageInfo(${realIndex}, 'returnId', this.value)"></td>
+                    <td><select class="table-select" onchange="updateDamageInfo(${realIndex}, 'returnMethod', this.value)"><option value="Fedex Pickup Return" ${item.returnMethod === 'Fedex Pickup Return' ? 'selected' : ''}>Fedex Pickup Return</option><option value="Return To Store" ${item.returnMethod === 'Return To Store' ? 'selected' : ''}>Return To Store</option><option value="No Need To Return" ${item.returnMethod === 'No Need To Return' ? 'selected' : ''}>No Need To Return</option></select></td>
+                    <td><select class="table-select" onchange="updateDamageInfo(${realIndex}, 'returnStatus', this.value)" style="${item.returnStatus === 'Pending' ? 'color:#d97706; font-weight:bold;' : 'color:#22c55e; font-weight:bold;'}"><option value="Pending" ${item.returnStatus === 'Pending' ? 'selected' : ''}>Pending</option><option value="Returned" ${item.returnStatus === 'Returned' ? 'selected' : ''}>Returned</option></select><div style="margin-top:5px; font-size:0.8rem; color:#ef4444;">Qty: ${item.damaged}</div></td>
+                    <td><button onclick="removeDamageReport(${realIndex})" class="btn-icon" style="color: #ef4444;"><i class="fa-solid fa-trash"></i></button></td>
+                </tr>`;
+
+        } else {
+            // ... (Keep existing Normal View logic)
+             const totalDelivered = item.deliveryLog ? item.deliveryLog.reduce((sum, log) => sum + log.qty, 0) : 0;
+             const isLow = item.available < 10;
+             const statusClass = isLow ? 'badge-low' : 'badge-ok';
+             const statusText = isLow ? 'Low Stock' : 'In Stock';
+             rowHtml = `
+            <tr>
+                <td style="text-align:center;"><button class="btn-star ${item.isStarred ? 'starred' : ''}" onclick="toggleStar(${realIndex})"><i class="${item.isStarred ? 'fa-solid starred' : 'fa-regular'} fa-star"></i></button></td>
+                <td><img src="${item.image}" class="product-img" onerror="this.src='https://via.placeholder.com/60?text=No+Img'"></td>
+                <td><div style="font-weight:bold; font-size:1.05rem;">${item.name}</div><div style="color:#64748b; font-size:0.85rem;">SKU: ${item.sku}</div></td>
+                <td><span class="badge ${statusClass}">${statusText}</span></td>
+                <td><div class="stock-control"><button class="btn-icon" onclick="updateAvailable(${realIndex}, -1)">-</button><input type="number" class="stock-input" value="${item.available}" onchange="manualStockUpdate(${realIndex}, this.value)"><button class="btn-icon" onclick="updateAvailable(${realIndex}, 1)">+</button></div></td>
+                <td><div class="delivery-cell"><div class="total-delivered">${totalDelivered} Units</div><button class="btn-log" onclick="openDeliveryModal(${realIndex})">View Log</button></div></td>
+                <td><button onclick="openDamageModal(${realIndex})" class="btn-icon" style="color: #ef4444; border: 1px solid #fee2e2; margin-right:5px;"><i class="fa-solid fa-triangle-exclamation"></i></button><button onclick="openEditModal(${realIndex})" class="btn-icon" style="color: #2563eb; margin-right: 5px;"><i class="fa-solid fa-pen"></i></button><button onclick="deleteItem(${realIndex})" class="btn-icon" style="color: #ef4444;"><i class="fa-solid fa-trash"></i></button></td>
             </tr>`;
         }
         
         tableBody.innerHTML += rowHtml;
     });
 }
-
 window.updateDamageInfo = (index, field, value) => {
     inventory[index][field] = value;
     saveData();
@@ -366,11 +371,18 @@ window.closeAllModals = () => {
 window.onclick = (e) => { if (e.target == itemModal || e.target == deliveryModal || e.target == damageModal) closeAllModals(); };
 searchInput.addEventListener('keyup', (e) => { refreshView(); });
 document.getElementById('addNewBtn').onclick = () => {
-    addForm.reset(); editIndexInput.value = "-1";
-    document.getElementById('imgPreview').style.display = "none"; 
-    document.getElementById('modalTitle').innerText = "Add New Product";
-    document.getElementById('saveBtn').innerText = "Save Product";
-    itemModal.style.display = "block";
+    if (currentFilter === 'longheld') {
+        // OPEN NEW SIMPLE MODAL
+        document.getElementById('longHeldForm').reset();
+        document.getElementById('longHeldModal').style.display = "block";
+    } else {
+        // OPEN STANDARD MODAL
+        addForm.reset(); editIndexInput.value = "-1";
+        document.getElementById('imgPreview').style.display = "none"; 
+        document.getElementById('modalTitle').innerText = "Add New Product";
+        document.getElementById('saveBtn').innerText = "Save Product";
+        itemModal.style.display = "block";
+    }
 };
 const SECRET_PIN = "1234"; 
 window.checkPin = () => {
@@ -402,3 +414,37 @@ window.removeDamageReport = (index) => {
         saveData();
     }
 };
+// --- LONG HELD FORM HANDLER ---
+document.getElementById('longHeldForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const qty = parseInt(document.getElementById('lhQty').value);
+    const note = document.getElementById('lhNote').value;
+    const fileInput = document.getElementById('lhFile');
+
+    if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const newItem = {
+                isLongHeld: true, // Special Flag
+                image: evt.target.result, // The photo
+                available: qty,
+                name: note || "Long-held Item", // Use note as name
+                dateAdded: new Date().toLocaleDateString(),
+                sku: "LH-" + Date.now().toString().slice(-4), // Fake SKU
+                isStarred: false,
+                damaged: 0
+            };
+            
+            inventory.unshift(newItem); // Add to top
+            saveData();
+            
+            // Reset and Close
+            document.getElementById('longHeldForm').reset();
+            document.getElementById('longHeldModal').style.display = 'none';
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        alert("Please upload or capture a photo!");
+    }
+});

@@ -41,6 +41,9 @@
             <button class="tab-btn tab-danger" onclick="switchTab('damaged')" id="tabDamaged">
                 <i class="fa-solid fa-triangle-exclamation"></i> Damaged / Returns
             </button>
+            <button class="tab-btn tab-longheld" onclick="switchTab('longheld')" id="tabLongHeld">
+    <i class="fa-solid fa-box-open"></i> Long-held Inv
+</button>
         </div>
     </div>
 
@@ -157,7 +160,25 @@
             </form>
         </div>
     </div>
+<div id="longHeldModal" class="modal">
+    <div class="modal-content" style="border-top: 5px solid #8b5cf6;">
+        <span class="close" onclick="closeAllModals()">&times;</span>
+        <h2 style="color: #8b5cf6;"><i class="fa-solid fa-camera"></i> Quick Add Long-held</h2>
+        
+        <form id="longHeldForm">
+            <label>1. Upload or Capture Photo</label>
+            <input type="file" id="lhFile" accept="image/*" required style="padding: 10px; border: 2px dashed #8b5cf6; background: #f5f3ff;">
+            
+            <label style="margin-top:15px;">2. Quantity</label>
+            <input type="number" id="lhQty" required min="1" placeholder="e.g. 50">
 
+            <label>Optional Note</label>
+            <input type="text" id="lhNote" placeholder="e.g. Old stock from 2023...">
+
+            <button type="submit" class="btn-save" style="background-color: #8b5cf6;">Save Item</button>
+        </form>
+    </div>
+</div>
     <script src="script.js"></script>
 </body>
 </html>

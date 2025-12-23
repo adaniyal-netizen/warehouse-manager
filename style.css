@@ -168,3 +168,28 @@ label { font-size: 0.9rem; font-weight: 600; color: #475569; }
     td:nth-child(7) button { flex: unset; width: 40px; height: 40px; border: 1px solid #eee; border-radius: 6px; }
     td:nth-child(6) { display: none; }
 }
+/* --- LONG HELD TAB STYLES --- */
+.tab-btn.tab-longheld:hover { background: #ddd6fe; color: #5b21b6; }
+.tab-btn.tab-longheld.active { 
+    background: white; 
+    color: #8b5cf6; 
+    border-top: 3px solid #8b5cf6;
+}
+
+/* Specific layout for Long Held Table Rows */
+.longheld-row {
+    grid-template-areas:
+        "image date"
+        "image note"
+        "qty qty"
+        "actions actions" !important;
+}
+
+/* Mobile Adjustments for Long Held */
+@media (max-width: 768px) {
+    .longheld-row td:nth-child(2) { grid-area: image; }
+    .longheld-row td:nth-child(3) { grid-area: note; padding:0; border:none; font-weight:bold;}
+    .longheld-row td:nth-child(4) { grid-area: date; padding:0; border:none; font-size:0.8rem; color:#888; text-align:right;}
+    .longheld-row td:nth-child(5) { grid-area: qty; background:#f5f3ff; border:none; padding:10px; text-align:center; font-weight:bold; color:#5b21b6;}
+    .longheld-row td:nth-child(6) { grid-area: actions; border:none; }
+}
