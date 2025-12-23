@@ -395,7 +395,7 @@ document.getElementById('addNewBtn').onclick = () => {
         itemModal.style.display = "block";
     }
 };
-const SECRET_PIN = "1234"; 
+const SECRET_PIN = "3647"; 
 window.checkPin = () => {
     const input = document.getElementById('pinInput').value;
     if (input === SECRET_PIN) { document.getElementById('loginOverlay').style.display = "none"; } 
