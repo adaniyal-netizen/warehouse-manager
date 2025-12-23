@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warehouse Stock Manager</title>
-    <link rel="stylesheet" href="style.css?v=mobile6">
+    <link rel="stylesheet" href="style.css?v=mobile8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
+
     <div id="loginOverlay" class="login-overlay">
         <div class="login-box">
             <h2><i class="fa-solid fa-lock"></i> Warehouse Login</h2>
@@ -35,7 +36,10 @@
                 <i class="fa-solid fa-list"></i> All Inventory
             </button>
             <button class="tab-btn" onclick="switchTab('starred')" id="tabStarred">
-                <i class="fa-solid fa-star"></i> Important (Starred)
+                <i class="fa-solid fa-star"></i> Important
+            </button>
+            <button class="tab-btn tab-danger" onclick="switchTab('damaged')" id="tabDamaged">
+                <i class="fa-solid fa-triangle-exclamation"></i> Damaged / Returns
             </button>
         </div>
     </div>
@@ -44,16 +48,7 @@
         <div class="table-wrapper">
             <table id="inventoryTable">
                 <thead>
-                    <tr>
-                        <th style="width: 50px;">Fav</th> 
-                        <th style="width: 80px;">Image</th>
-                        <th>Product Details</th>
-                        <th>Status</th>
-                        <th>Available Stock (Manual)</th>
-                        <th>Delivered History (Log)</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
+                    </thead>
                 <tbody>
                     <tr><td colspan="7" style="text-align:center; padding:20px;">Connecting to database...</td></tr>
                 </tbody>
@@ -68,23 +63,18 @@
             
             <form id="addForm">
                 <input type="hidden" id="editIndex" value="-1">
-
                 <label>Product Name</label>
                 <input type="text" id="prodName" required placeholder="Paste Product Title...">
-                
                 <label>ASIN (Amazon SKU)</label>
                 <input type="text" id="prodSku" required placeholder="Paste ASIN (e.g. B08N5KWB9H)" maxlength="10" oninput="autoFillImage()">
                 <p style="font-size: 0.8rem; color: #666; margin-top: 5px; margin-bottom: 15px;">Image URL will be fetched automatically.</p>
-
                 <label>Image URL (Auto-Generated)</label>
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <input type="url" id="prodImg" placeholder="Image link will appear here..." required style="margin:0;">
                     <img id="imgPreview" src="" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; display: none; border: 1px solid #ccc; background: white;">
                 </div>
-
                 <label style="margin-top: 15px;">Initial Available Quantity</label>
                 <input type="number" id="prodAvail" value="0">
-
                 <button type="submit" class="btn-save" id="saveBtn" style="margin-top: 20px;">Save Product</button>
             </form>
         </div>
@@ -95,10 +85,9 @@
             <span class="close" onclick="closeAllModals()">&times;</span>
             <h2>Delivery History</h2>
             <h3 id="deliveryItemName" style="color: #64748b; font-weight: normal; margin-bottom: 20px;"></h3>
-
             <div class="add-delivery-box">
                 <h4><i class="fa-solid fa-truck-ramp-box"></i> Record New Delivery</h4>
-                <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">Note: This only updates the history log. It does NOT change available stock.</p>
+                <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">Note: This only updates the history log.</p>
                 <form id="deliveryForm" class="delivery-form-row">
                     <input type="hidden" id="deliveryIndex">
                     <div class="input-group">
@@ -112,25 +101,60 @@
                     <button type="submit" class="btn-primary" style="height: 42px; align-self: flex-end;">Add Log</button>
                 </form>
             </div>
-
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h4>Lifetime Records</h4>
                 <button onclick="exportHistory()" class="btn-outline"><i class="fa-solid fa-file-excel"></i> Download Excel</button>
             </div>
-            
             <div class="history-table-wrapper">
                 <table id="historyTable">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Quantity</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Date</th><th>Time</th><th>Quantity</th><th>Action</th></tr></thead>
                     <tbody id="historyList"></tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <div id="damageModal" class="modal">
+        <div class="modal-content" style="border-top: 5px solid #ef4444;">
+            <span class="close" onclick="closeAllModals()">&times;</span>
+            <h2 style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Report Return/Damage</h2>
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">
+                Moves items to "Damaged" tab and sets return details.
+            </p>
+
+            <form id="damageForm">
+                <input type="hidden" id="damageIndex">
+                <h3 id="damageItemName" style="margin-bottom: 15px;"></h3>
+
+                <div class="form-row">
+                    <div>
+                        <label>Quantity Damaged</label>
+                        <input type="number" id="damageQty" required min="1" placeholder="e.g. 1">
+                    </div>
+                    <div>
+                        <label>Return Order ID</label>
+                        <input type="text" id="dmgReturnId" placeholder="Order #12345">
+                    </div>
+                </div>
+
+                <label>Return Method</label>
+                <select id="dmgMethod" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 15px;">
+                    <option value="Fedex Pickup Return">Fedex Pickup Return</option>
+                    <option value="Return To Store">Return To Store</option>
+                    <option value="No Need To Return">No Need To Return</option>
+                </select>
+
+                <label>Current Status</label>
+                <select id="dmgStatus" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 15px;">
+                    <option value="Pending">Pending</option>
+                    <option value="Returned">Returned</option>
+                </select>
+
+                <label>Upload Photo (Optional)</label>
+                <input type="file" id="damageFile" accept="image/*" style="padding: 5px;">
+
+                <button type="submit" class="btn-save" style="background-color: #ef4444;">Confirm & Save</button>
+            </form>
         </div>
     </div>
 
